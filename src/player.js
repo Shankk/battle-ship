@@ -1,7 +1,7 @@
 export default class Player {
     constructor(name) {
         this.name = name
-        this.ourTurn = false
+        this.turnStatus = false
     }
 
     getName() {
@@ -9,12 +9,14 @@ export default class Player {
     }
 
     getTurnStatus() {
-        return this.ourTurn
+        return this.turnStatus
     }
 
     toggleTurn() {
-        this.ourTurn = !this.ourTurn
-        if(this.ourTurn) return console.log("Player " + this.name + "'s Turn!")
-        
+        this.turnStatus = !this.turnStatus
+    }
+
+    disableAttacks() {
+        this.turnStatus = false
     }
 }

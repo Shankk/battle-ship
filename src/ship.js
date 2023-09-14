@@ -39,6 +39,7 @@ export default class Ship {
 
     isShipSunk() {
         if(this.hitCount >= this.length) this.isSunk = true
-        if(this.isSunk) return console.log(this.name + " is Destroyed")
+        if(this.isSunk) console.log(this.name + " is Destroyed")
+        return this.isSunk
     }
 }
