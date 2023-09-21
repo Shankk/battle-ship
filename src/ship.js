@@ -1,36 +1,35 @@
 export default class Ship {
-    constructor(name,length, xCord, yCord) {
+    constructor(name,length) {
         this.name = name
         this.length = length
-        this.xCord = xCord
-        this.yCord = yCord
         this.hitCount = 0
         this.isSunk = false
-        this.shipObjects = []
-        for(let i = 0; i < this.length; i++) {
-            this.shipObjects.push(xCord + "" + (yCord + i))
-        }
-        console.log(name + " " + this.shipObjects)
+        this.shipLocations = []
     }
 
     getName() {
         return this.name
     }
 
-    getObjects() {
-        return this.shipObjects
-    }
-
-    getX() {
-        return this.xCord
-    }
-
-    getY() {
-        return this.yCord
+    getLocations() {
+        return this.shipLocations
     }
 
     getLength() {
         return this.length
+    }
+
+    createShipLocations(xCord,yCord) {
+        if((Number(yCord) + this.length) <= 10) 
+        {   this.shipLocations = []
+            for(let i = 0; i < this.length; i++) {
+                this.shipLocations.push(xCord + "" + (Number(yCord) + i))
+            }
+            return true
+        }
+        else {
+            return false
+        }
     }
 
     takeHit () {
@@ -39,7 +38,6 @@ export default class Ship {
 
     isShipSunk() {
         if(this.hitCount >= this.length) this.isSunk = true
-        if(this.isSunk) console.log(this.name + " is Destroyed")
         return this.isSunk
     }
 }

@@ -4,20 +4,25 @@ import missIMG from "./images/Circle_White.png"
 import hitIMG from "./images/Circle_Red.png"
 
 export default class Gameboard {
-    constructor(size, owner, player, opponent, gameStatus) {
+    constructor(size, gameStatus, player, opponent) {
         this.size = size
-        this.owner = owner
         this.player = player
         this.opponent = opponent
         this.gameStatus = gameStatus
         this.attackHandler = (event) => this.receiveAttack(event)
-        this.carrier = new Ship("Carrier",5, 1 , 1)
-        this.battleship = new Ship("Battle ship",4, 3, 1)
-        this.cruiser = new Ship("Cruiser", 3, 5, 1)
-        this.submarine = new Ship("Submarine",3, 7, 5)
-        this.destroyer = new Ship("Destroyer",2, 3, 6)
-        this.ships = [this.carrier]//,[this.battleship,this.cruiser,this.submarine,this.destroyer]
-        this.gameboard = this.generateGameboard(this.size)
+        this.placementHandler = (event) => this.submitShipPlacement(event)
+        this.togglePlacementHandler = (event) => this.toggleShipPlacement(event)
+        this.carrier = new Ship("Carrier",5)
+        this.battleship = new Ship("Battle ship",4)
+        this.cruiser = new Ship("Cruiser", 3)
+        this.submarine = new Ship("Submarine",3)
+        this.destroyer = new Ship("Destroyer",2)
+        this.placementShips = [this.carrier,this.battleship,this.cruiser,this.submarine,this.destroyer]
+        this.ships = [this.carrier,this.battleship,this.cruiser,this.submarine,this.destroyer]
+        this.gameboard = document.createElement('grid');
+        this.gameboard.className = 'grid';
+        this.gameBoardObjects = []
+        if(!this.gameBoardObjects.length) this.initBoardObjects()
         this.opponentGameBoard = document.createElement('grid');
     }
 
@@ -29,64 +34,152 @@ export default class Gameboard {
         this.opponentGameBoard = gameboard
     }
 
-    generateGameboard(size) {
-        let gameboard = document.createElement('grid');
-        gameboard.className = 'grid';
-        for(let i = 0; i < size; i++) // Columns
+    initBoardObjects() {
+        for(let i = 0; i < (this.size * 10); i++) {
+            if(i < 10) this.gameBoardObjects.push({id:"0" + i.toString(),hasShip:false})
+            else this.gameBoardObjects.push({id:i.toString(), hasShip:false})
+        }
+    }
+    
+    generatePlacementBoard() {
+        this.gameboard.textContent = ""
+        for(let i = 0; i < this.size; i++) // Columns
         {
             let column = document.createElement('div');
             column.className = 'column';
-            for(let k = 0; k < size; k++) // Rows
+            for(let k = 0; k < this.size; k++) // Rows
             {
                 let row = document.createElement('div');
                 row.className = 'row';
-                row.id = (k) + '' + (i)+ this.owner;
-                row.addEventListener('click', this.attackHandler)
-                //row.textContent = (k) + '' + (i);
+                row.id = (k) + '' + (i)+ this.player.getOwner();
+                row.addEventListener('mouseover', this.togglePlacementHandler)
+                row.addEventListener('mouseout',this.togglePlacementHandler)
+                row.addEventListener('click', this.placementHandler)
                 column.appendChild(row);
             }
-            gameboard.appendChild(column);
+            this.gameboard.appendChild(column);
         }
-        return gameboard
+    }
+
+    generateGameBoard() {
+        this.gameboard.textContent = ""
+        for(let i = 0; i < this.size; i++) // Columns
+        {
+            let column = document.createElement('div');
+            column.className = 'column';
+            for(let k = 0; k < this.size; k++) // Rows
+            {
+                let row = document.createElement('div');
+                row.className = 'row'; 
+                row.id = (k) + '' + (i)+ this.player.getOwner();
+                column.appendChild(row);
+            }
+            this.gameboard.appendChild(column);
+        }
+    }
+
+    generateComputerBoard() {
+        this.gameboard.textContent = ""
+        for(let i = 0; i < this.size; i++) // Columns
+        {
+            let column = document.createElement('div');
+            column.className = 'column';
+            for(let k = 0; k < this.size; k++) // Rows
+            {
+                let row = document.createElement('div');
+                row.className = 'row empty'; 
+                row.id = (k) + '' + (i)+ this.player.getOwner();
+                row.addEventListener('click', this.attackHandler)
+                column.appendChild(row);
+            }
+            this.gameboard.appendChild(column);
+        }
     }
     
-    //Fix taking attacks and respond to misses.
-    //Currently we assign the ship coords on the class object itself.
-    //We then match those coords and change the color of the coord to act like the 'ships'
-    //since we are assigning the 'ships' to the coords. we also add an event listerner to respond
-    //as if we are receivng the attack, otherwise we miss.
+    getXAxisShipObjects(element) {
+        if(element != null && this.placementShips.length > 0) {
+            let xCord = element.id.slice(0,1)
+            let yCord = element.id.slice(1,2)
+            let shipObjects = []
+            for(let i = 0; i < this.placementShips[0].length; i++) {
+                if((Number(yCord) + this.placementShips[0].length) <= 10){
+                    shipObjects.push(document.getElementById(xCord + (Number(yCord)+i) + this.player.getOwner()))
+                }
+                else return null
+            }
+            return shipObjects
+        }
+    }
 
-    
+    toggleShipPlacement(event) {
+        let element = document.getElementById(event.target.id)
+        let shipObjects = this.getXAxisShipObjects(element)
+        for(let object in shipObjects) {
+            if(shipObjects[object].style.backgroundColor == "grey") {
+                shipObjects[object].style.backgroundColor = ""
+            }
+            else if(shipObjects[object].style.backgroundColor == "") {
+                shipObjects[object].style.backgroundColor = "grey"
+            }
+        }
 
-    toggleShipLocations() {
+    }
+
+    submitShipPlacement(event) {
+        if(this.placementShips.length > 0) {
+            let element = document.getElementById(event.target.id)
+            let xCord = element.id.slice(0,1)
+            let yCord = element.id.slice(1,2)
+            if((Number(yCord) + this.placementShips[0].getLength()) > 10) return console.log("Cant Place Boat Here.")
+            this.placementShips[0].createShipLocations(xCord,yCord)
+            for(let location in this.placementShips[0].getLocations()) {
+                if(document.getElementById(this.placementShips[0].getLocations()[location] + this.player.getOwner()).style.backgroundColor == "green") {
+                    return console.log("Cant Place Boat Here.")
+                }
+            }
+            this.placementShips.shift()
+            this.showShips()
+            if(this.placementShips[0] != null) this.gameStatus.textContent = this.player.getName() + " Place Your " + this.placementShips[0].getName()
+            else {
+                this.gameStatus.textContent = ""
+                this.generateGameBoard()
+                this.showShips()
+                this.forceThisBoardTurn()
+            } 
+        }
+    }
+
+    attackLocation(position) {
+        //Search Through All Ship Coordinates and check if we hit a ship
         for(let ship in this.ships) {
-            for(let object in this.ships[ship].getObjects()) {
-                let id = this.ships[ship].getObjects()[object] + this.owner
-                if(document.getElementById(id) != null) {
-                    let element = document.getElementById(id)
-                    element.style.backgroundColor = "grey"
-                  /*   if(this.player.getTurnStatus() == false) {
-                        element.style.backgroundColor = "rgb(0,0,0,0.0)"
+            if(this.ships[ship].isShipSunk()) {}
+            else {
+                for(let object in this.ships[ship].getLocations()) {
+                    let id = this.ships[ship].getLocations()[object]
+                    if(position == id) {
+                        this.ships[ship].takeHit()
+                        if(this.ships[ship].isShipSunk()) {
+                            for(let object in this.ships[ship].getLocations()) {
+                                let id = this.ships[ship].getLocations()[object] + this.player.getOwner();
+                                if(document.getElementById(id) != null) {
+                                    let element = document.getElementById(id)
+                                    element.style.backgroundColor = "green"
+                                }
+                            }
+                        }
+                        return true
                     }
-                    else {
-                        element.style.backgroundColor = "green"
-                    } */
                 }
             }
         }
+        return false
     }
 
-    getShipLocation(position) {
-        for(let ship in this.ships) {
-            for(let object in this.ships[ship].getObjects()) {
-                let id = this.ships[ship].getObjects()[object]
-                if(position == id) {
-                    this.ships[ship].takeHit()
-                    this.ships[ship].isShipSunk()
-                    return true
-                }
-            }
-        }
+    createNewHitImage(element, hitShip) {
+        const newHit = document.createElement('img')
+        newHit.src = hitShip ? hitIMG : missIMG
+        newHit.width = newHit.height = 24
+        element.appendChild(newHit)
     }
 
     receiveAttack(event) {
@@ -95,25 +188,37 @@ export default class Gameboard {
             let position = event.target.id.slice(0,2)
             if(this.opponent.getTurnStatus() === false) return console.log("Cant Attack Your Board")
             else {
-                if(this.getShipLocation(position)) {
-                    const newHit = document.createElement('img')
-                    newHit.src = hitIMG
-                    newHit.width = newHit.height = 24
-                    element.appendChild(newHit)
-                    element.classList.add("hit")
-                    console.log("You Hit a Enemy Ship!")
-                }
-                else {
-                    const newMiss = document.createElement('img')
-                    newMiss.src = missIMG
-                    newMiss.width = newMiss.height = 24
-                    element.appendChild(newMiss)
-                    element.classList.add("hit")
-                    console.log("Missed, No Ship Here")
-                }
+                const didWeHitAShip = this.attackLocation(position)
+                this.createNewHitImage(element,didWeHitAShip)
+                element.className = "row hit"
                 this.forceThisBoardTurn()
-                this.isFleetDestroyed()
+                if(this.isFleetDestroyed() == true) {
+                    console.log(this.player.getName() + " has lost all of their fleet!")
+                    this.player.disableAttacks()
+                    this.opponent.disableAttacks()
+                    this.gameStatus.textContent = this.player.getName() + " has lost all of their Ships!\r\n" + this.opponent.getName() + " is the Winner!"
+                }
+                else this.receiveComputerAttack()
                 element.removeEventListener('click', this.attackHandler)
+            }
+        }
+    }
+
+    receiveComputerAttack() {
+        let rndInt = this.randomIntFromInterval(0,this.gameBoardObjects.length-1)
+        let element = document.getElementById(this.gameBoardObjects[rndInt].id + this.opponent.getOwner())
+        if(element != null) {
+            if(this.opponent.getTurnStatus() === true) return console.log("Cant Attack")
+            else {
+                const didWeHitAShip = this.opponentGameBoard.attackLocation(this.gameBoardObjects[rndInt].id)
+                this.createNewHitImage(element,didWeHitAShip)
+                this.gameBoardObjects.splice(rndInt,1)
+                this.forceThisBoardTurn()
+                if(this.opponentGameBoard.isFleetDestroyed() == true) {
+                    this.player.disableAttacks()
+                    this.opponent.disableAttacks()
+                    this.gameStatus.textContent = this.opponent.getName() + " has lost all of their Ships!\r\n" + this.player.getName() + " is the Winner!"
+                }
             }
         }
     }
@@ -125,21 +230,49 @@ export default class Gameboard {
                 count++
             }
         }
-        if(count >= this.ships.length) {
-            console.log(this.player.getName() + " has lost all of their fleet!")
-            this.player.disableAttacks()
-            this.opponent.disableAttacks()
-            this.gameStatus.textContent = this.opponent.getName() + " is the Winner!"
+        return count >= 5 ? true : false
+    }
+
+    assignRandomShips() {
+        for(let ship in this.ships) {
+            while(this.ships[ship].shipLocations.length == 0) {
+                let rndIntX = this.randomIntFromInterval(0,9)
+                let rndIntY = this.randomIntFromInterval(0,9)
+                let ctn = 0
+                if((rndIntY + this.ships[ship].length) <=10) {
+                    if(this.gameBoardObjects[Number(rndIntX.toString() + rndIntY.toString())].hasShip == false && 
+                    this.gameBoardObjects[Number(rndIntX.toString() + rndIntY.toString()) + this.ships[ship].length].hasShip == false) {
+                        for(let i = 0; i < this.ships[ship].length; i++) {
+                            this.gameBoardObjects[Number(rndIntX.toString() + rndIntY.toString()) + i].hasShip = true
+                        }
+                        this.ships[ship].createShipLocations(rndIntX,rndIntY)
+                        //console.log(this.gameBoardObjects)
+                    }
+                }
+            }
+            //this.showShips()
+        }
+        
+    }
+
+    randomIntFromInterval(min, max) { // min and max included 
+        return Math.floor(Math.random() * (max - min + 1) + min)
+    } 
+
+    showShips() {
+        for(let ship in this.ships) {
+            for(let object in this.ships[ship].getLocations()) {
+                let id = this.ships[ship].getLocations()[object] + this.player.getOwner();
+                if(document.getElementById(id) != null) {
+                    let element = document.getElementById(id)
+                    element.style.backgroundColor = "green"
+                }
+            }
         }
     }
 
     forceThisBoardTurn() {
         this.player.toggleTurn() // Enables the Receivers Turn to Attack their opponent
-        this.opponent.disableAttacks() //Disables the Attackers Turn since they attacked
-        this.gameStatus.textContent = this.player.getName() + "'s Turn!"
-        this.gameboard.style.boxShadow = "0px 0px 10px 5px red";
-        this.opponentGameBoard.getBoard().style.boxShadow = "0px 0px 10px 5px green";
-        //this.toggleShipLocations()
-        //this.opponentGameBoard.toggleShipLocations()
+        this.opponent.toggleTurn() //Disables the Attackers Turn since they attacked
     }
 }
