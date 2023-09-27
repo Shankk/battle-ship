@@ -33,14 +33,11 @@ const playerTwo = new Player("Computer","p2")
 const pOneGameboard = new Gameboard(boardSize,gameStatus, playerOne, playerTwo,gameBoardOne)
 const pTwoGameboard = new Gameboard(boardSize,gameStatus, playerTwo, playerOne,gameBoardTwo)
 
-function generateGameInfo() {
+function generateGameContent() {
     playerOneHeader.textContent = playerOne.getName() + "'s Board"
     playerTwoHeader.textContent = playerTwo.getName() + "'s Board"
     gameStatus.textContent = playerOne.getName() + " Place Your Carrier!"
-    mainContent.appendChild(gameStatus)
-}
 
-function generateGameContent() {
     gameContainer.appendChild(gameBoardOne)
     pOneGameboard.generatePlacementBoard()
     gameBoardOne.appendChild(playerOneHeader)
@@ -55,6 +52,7 @@ function generateGameContent() {
     pOneGameboard.assignEnemyGameBoard(pTwoGameboard)
     pTwoGameboard.assignEnemyGameBoard(pOneGameboard)
 
+    mainContent.appendChild(gameStatus)
     mainContent.appendChild(gameContainer)
 }
 
@@ -66,7 +64,6 @@ function generateStartContent() {
         if(inputName.value.length >= inputName.minLength) {
             mainContent.textContent = ""
             playerOne.setName(inputName.value)
-            generateGameInfo()
             generateGameContent()
             
         }
