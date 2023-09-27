@@ -10,9 +10,6 @@ body {
     padding: 0px;
     width: 100vw;
     height: 100vh;
-
-    display: flex;
-    flex-flow: column nowrap;
 }
 
 .title {
@@ -20,6 +17,7 @@ body {
     letter-spacing: 16px;
     color: white;
     text-shadow: -4px 4px #ff0000;
+    text-align: center;
 }
 
 input {
@@ -40,40 +38,42 @@ h2 {
 }
 
 #content {
-    min-width: 1024px;
-    min-height: 768px;
-    width: 100%;
-    height: 100%;
-    gap: 40px;
+    width: 100vw;
+    height: 100vh;
     background-color: rgb(0, 0, 66);
+    gap: 20px;
     display: flex;
     flex-flow: column;
     justify-content: center;
     align-items: center;
 }
 
-#gameInfo {
+#gameStatus {
     width: 100%;
-    height: 10%;
+    height: 100px;
     padding: 0px 10vw;
-    gap: 80px;
     display: flex;
     flex-flow: row;
     justify-content: space-evenly;
     align-items: center;
-}
-
-#gameStatus {
     white-space: pre;
 }
 
-#gameBoards {
-    width: 100%;
-    height: 100%;
-    padding: 0px 40px;
-    gap: 10vw;
+#gameContainer {
     display: flex;
     flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 60px;
+}
+
+.gameBoard {
+    width: 100%;
+    height: 100%;
+    padding: 0px 0px;
+    gap: 20px;
+    display: flex;
+    flex-flow: column nowrap;
     justify-content: center;
     align-items: center;
     flex: 0;
@@ -136,4 +136,93 @@ button:hover {
 
 button:active {
     transform: scale(0.95);
+}
+
+
+@media (max-width: 600px) {
+
+    .title {
+        font-size: 48px;
+    }
+
+    h2 {
+        font-size: 0.75em;
+        min-width: 50px;
+    }
+
+    #gameStatus {
+        height: 2%;
+        padding: 0px 20px;
+        gap: 20px;
+        flex-flow: row;
+        white-space: normal;
+    }
+    
+    #gameContainer {
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .grid {
+        width: 340px;
+        height: 320px;
+        padding: 0px 0px;
+        gap: 2px;
+    }
+    .column {
+        width: auto;
+        height: 320px;
+        gap: 2px;
+    }
+    
+    .row {
+        width: 32px;
+    }
+}
+
+@media (max-height: 600px) {
+
+    .title {
+        font-size: 48px;
+    }
+
+    h2 {
+        font-size: 0.75em;
+        min-width: 50px;
+    }
+
+    #gameStatus {
+        height: 2%;
+        padding: 0px 20px;
+        gap: 20px;
+        flex-flow: row;
+        white-space: normal;
+    }
+    
+    #gameContainer {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: center;
+        align-items: center;
+        gap: 60px;
+    }
+
+    .grid {
+        width: 340px;
+        height: 320px;
+        padding: 0px 0px;
+        gap: 2px;
+    }
+    .column {
+        width: auto;
+        height: 320px;
+        gap: 2px;
+    }
+    
+    .row {
+        width: 32px;
+    }
 }

@@ -178,7 +178,7 @@ export default class Gameboard {
     createNewHitImage(element, hitShip) {
         const newHit = document.createElement('img')
         newHit.src = hitShip ? hitIMG : missIMG
-        newHit.width = newHit.height = 24
+        newHit.width = newHit.height = 20
         element.appendChild(newHit)
     }
 

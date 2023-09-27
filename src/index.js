@@ -9,8 +9,7 @@ inputName.maxLength = 20
 const startBtn = document.createElement('button')
 startBtn.textContent = "Start Game"
 // Game Header Info
-const gameInfo = document.createElement('div')
-gameInfo.id = "gameInfo"
+
 const playerOneHeader = document.createElement('h2')
 const playerTwoHeader = document.createElement('h2')
 playerOneHeader.id = "playerOne"
@@ -18,36 +17,45 @@ playerTwoHeader.id = "playerTwo"
 const gameStatus = document.createElement('h2')
 gameStatus.id = "gameStatus"
 // Game Board Container
-const gameContent = document.createElement('div')
-gameContent.id = "gameBoards"
+const gameContainer = document.createElement('div')
+gameContainer.id = "gameContainer"
+const gameBoardOne = document.createElement('div')
+gameBoardOne.className = "gameBoard"
+gameBoardOne.id = "gameBoardOne"
+const gameBoardTwo = document.createElement('div')
+gameBoardTwo.className = "gameBoard"
+gameBoardTwo.id = "gameBoardTwo"
 
 const boardSize = 10
 
 const playerOne = new Player("Player","p1")
 const playerTwo = new Player("Computer","p2")
-const pOneGameboard = new Gameboard(boardSize,gameStatus, playerOne, playerTwo,gameContent)
-const pTwoGameboard = new Gameboard(boardSize,gameStatus, playerTwo, playerOne,gameContent)
+const pOneGameboard = new Gameboard(boardSize,gameStatus, playerOne, playerTwo,gameBoardOne)
+const pTwoGameboard = new Gameboard(boardSize,gameStatus, playerTwo, playerOne,gameBoardTwo)
 
 function generateGameInfo() {
-    mainContent.appendChild(gameInfo)
     playerOneHeader.textContent = playerOne.getName() + "'s Board"
     playerTwoHeader.textContent = playerTwo.getName() + "'s Board"
     gameStatus.textContent = playerOne.getName() + " Place Your Carrier!"
-    gameInfo.appendChild(playerOneHeader)
-    gameInfo.appendChild(gameStatus)
-    gameInfo.appendChild(playerTwoHeader)
+    mainContent.appendChild(gameStatus)
 }
 
 function generateGameContent() {
-    mainContent.appendChild(gameContent)
+    gameContainer.appendChild(gameBoardOne)
     pOneGameboard.generatePlacementBoard()
-    gameContent.appendChild(pOneGameboard.getBoard())
+    gameBoardOne.appendChild(playerOneHeader)
+    gameBoardOne.appendChild(pOneGameboard.getBoard())
+
+    gameContainer.appendChild(gameBoardTwo)
     pTwoGameboard.generateComputerBoard()
-    gameContent.appendChild(pTwoGameboard.getBoard())
+    gameBoardTwo.appendChild(playerTwoHeader)
+    gameBoardTwo.appendChild(pTwoGameboard.getBoard())
     pTwoGameboard.assignRandomShips()
 
     pOneGameboard.assignEnemyGameBoard(pTwoGameboard)
     pTwoGameboard.assignEnemyGameBoard(pOneGameboard)
+
+    mainContent.appendChild(gameContainer)
 }
 
 function generateStartContent() {
